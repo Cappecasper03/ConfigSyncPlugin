@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "Global Setting Syncer",
+	"Description": "Unified visual system for syncing all project configs including plugins with automatic discovery",
+	"Category": "Editor",
+	"CreatedBy": "Cappecasper03",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "GlobalSettingSyncer",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	]
+}
