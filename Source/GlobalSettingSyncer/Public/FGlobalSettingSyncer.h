@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
+DECLARE_LOG_CATEGORY_EXTERN( GlobalSettingSyncer, Log, All )
+
 class FGlobalSettingSyncerModule : public IModuleInterface
 {
 public:
@@ -11,8 +13,4 @@ public:
 
 private:
 	static void PluginButtonClicked();
-
-	void RegisterMenus();
-
-	TSharedPtr< FUICommandList > PluginCommands;
 };

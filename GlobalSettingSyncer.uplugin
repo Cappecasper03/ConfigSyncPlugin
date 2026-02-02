@@ -3,7 +3,7 @@
 	"Version": 1,
 	"VersionName": "1.0",
 	"FriendlyName": "Global Setting Syncer",
-	"Description": "Unified visual system for syncing all project configs including plugins with automatic discovery",
+	"Description": "Synchronize configuration files across multiple projects and engine versions with automatic file discovery and configurable sync scopes",
 	"Category": "Editor",
 	"CreatedBy": "Cappecasper03",
 	"CreatedByURL": "",
