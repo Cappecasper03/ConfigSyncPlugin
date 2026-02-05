@@ -9,11 +9,20 @@
 #include "Widgets/Notifications/SNotificationList.h"
 
 UGlobalSettingSyncerConfig::UGlobalSettingSyncerConfig()
-: LastSyncTime( FDateTime::MinValue() )
+: LastSyncTime( FDateTime::MinValue() ) {}
+
+UGlobalSettingSyncerConfig* UGlobalSettingSyncerConfig::Get()
 {
 	TRACE_CPU_SCOPE;
 
-	InitializeDefaultFileFilters();
+	if( !Instance )
+	{
+		Instance = GetMutableDefault< UGlobalSettingSyncerConfig >();
+		Instance->AddToRoot();
+		Instance->LoadPluginSettings();
+	}
+
+	return Instance;
 }
 
 void UGlobalSettingSyncerConfig::DiscoverAndAddConfigFiles()
@@ -133,116 +142,6 @@ bool UGlobalSettingSyncerConfig::LoadSettingsFromGlobal()
 	}
 
 	return bSuccess;
-}
-
-FString UGlobalSettingSyncerConfig::GetGlobalSettingSyncerDirectory()
-{
-	TRACE_CPU_SCOPE;
-
-	static FString BaseDir = FPlatformProcess::UserSettingsDir();
-	return FPaths::Combine( BaseDir, "UnrealEngine", "GlobalSettingSyncer" );
-}
-
-FString UGlobalSettingSyncerConfig::GetScopedSettingsDirectory( const EGlobalSettingSyncerScope Scope )
-{
-	TRACE_CPU_SCOPE;
-
-	FString BaseDir = GetGlobalSettingSyncerDirectory();
-
-	switch( Scope )
-	{
-		case EGlobalSettingSyncerScope::Global:
-			return FPaths::Combine( BaseDir, "Global" );
-		case EGlobalSettingSyncerScope::PerEngineVersion:
-		{
-			static FString EngineVersion = FString::Printf( TEXT( "%d.%d" ), ENGINE_MAJOR_VERSION, ENGINE_MINOR_VERSION );
-			return FPaths::Combine( BaseDir, "PerEngineVersion", EngineVersion );
-		}
-		case EGlobalSettingSyncerScope::PerProject:
-			return FPaths::Combine( BaseDir, "PerProject", FApp::GetProjectName() );
-		default:
-			return BaseDir;
-	}
-}
-
-UGlobalSettingSyncerConfig* UGlobalSettingSyncerConfig::Get()
-{
-	TRACE_CPU_SCOPE;
-
-	if( !Instance )
-	{
-		Instance = GetMutableDefault< UGlobalSettingSyncerConfig >();
-		Instance->AddToRoot();
-		Instance->LoadPluginSettings();
-	}
-
-	return Instance;
-}
-
-bool UGlobalSettingSyncerConfig::SavePluginSettings() const
-{
-	TRACE_CPU_SCOPE;
-
-	const FString SettingsFilePath = GetPluginSettingsFilePath();
-	const FString SettingsDir      = FPaths::GetPath( SettingsFilePath );
-	if( !EnsureDirectoryExists( SettingsDir ) )
-	{
-		UE_LOG( GlobalSettingSyncer, Error, TEXT( "Failed to create settings directory: %s" ), *SettingsDir );
-		return false;
-	}
-
-	FString OutputString;
-	if( !FJsonObjectConverter::UStructToJsonObjectString( ConfigFileSettingsStruct, OutputString, 0, 0, 0, nullptr, true ) )
-	{
-		UE_LOG( GlobalSettingSyncer, Error, TEXT( "Failed to convert settings JSON: %s" ), *SettingsFilePath );
-		return false;
-	}
-
-	if( !FFileHelper::SaveStringToFile( OutputString, *SettingsFilePath ) )
-	{
-		UE_LOG( GlobalSettingSyncer, Error, TEXT( "Failed to write settings file: %s" ), *SettingsFilePath );
-		return false;
-	}
-
-	UE_LOG( GlobalSettingSyncer, Log, TEXT( "Plugin settings saved to: %s" ), *SettingsFilePath );
-	return true;
-}
-
-bool UGlobalSettingSyncerConfig::LoadPluginSettings()
-{
-	TRACE_CPU_SCOPE;
-
-	const FString SettingsFilePath = GetPluginSettingsFilePath();
-
-	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
-	if( !PlatformFile.FileExists( *SettingsFilePath ) )
-	{
-		UE_LOG( GlobalSettingSyncer, Warning, TEXT( "Settings file not found: %s" ), *SettingsFilePath );
-		return false;
-	}
-
-	FString JsonString;
-	if( !FFileHelper::LoadFileToString( JsonString, *SettingsFilePath ) )
-	{
-		UE_LOG( GlobalSettingSyncer, Error, TEXT( "Failed to read settings file: %s" ), *SettingsFilePath );
-		return false;
-	}
-
-	if( !FJsonObjectConverter::JsonObjectStringToUStruct( JsonString, &ConfigFileSettingsStruct ) )
-	{
-		UE_LOG( GlobalSettingSyncer, Error, TEXT( "Failed to convert settings JSON: %s" ), *SettingsFilePath );
-		return false;
-	}
-
-	UE_LOG( GlobalSettingSyncer, Log, TEXT( "Plugin settings loaded from: %s" ), *SettingsFilePath );
-	return true;
-}
-
-FString UGlobalSettingSyncerConfig::GetPluginSettingsFilePath()
-{
-	TRACE_CPU_SCOPE;
-
-	return FPaths::Combine( GetScopedSettingsDirectory( EGlobalSettingSyncerScope::PerProject ), "GlobalSettingSyncerSettings.json" );
 }
 
 void UGlobalSettingSyncerConfig::OnSettingsChanged()
@@ -411,6 +310,43 @@ FString UGlobalSettingSyncerConfig::GetRelativePathForFile( const FString& Absol
 	}
 
 	return TEXT( "Config/" ) + FileName;
+}
+
+FString UGlobalSettingSyncerConfig::GetGlobalSettingSyncerDirectory()
+{
+	TRACE_CPU_SCOPE;
+
+	static FString BaseDir = FPlatformProcess::UserSettingsDir();
+	return FPaths::Combine( BaseDir, "UnrealEngine", "GlobalSettingSyncer" );
+}
+
+FString UGlobalSettingSyncerConfig::GetScopedSettingsDirectory( const EGlobalSettingSyncerScope Scope )
+{
+	TRACE_CPU_SCOPE;
+
+	FString BaseDir = GetGlobalSettingSyncerDirectory();
+
+	switch( Scope )
+	{
+		case EGlobalSettingSyncerScope::Global:
+			return FPaths::Combine( BaseDir, "Global" );
+		case EGlobalSettingSyncerScope::PerEngineVersion:
+		{
+			static FString EngineVersion = FString::Printf( TEXT( "%d.%d" ), ENGINE_MAJOR_VERSION, ENGINE_MINOR_VERSION );
+			return FPaths::Combine( BaseDir, "PerEngineVersion", EngineVersion );
+		}
+		case EGlobalSettingSyncerScope::PerProject:
+			return FPaths::Combine( BaseDir, "PerProject", FApp::GetProjectName() );
+		default:
+			return BaseDir;
+	}
+}
+
+FString UGlobalSettingSyncerConfig::GetPluginSettingsFilePath()
+{
+	TRACE_CPU_SCOPE;
+
+	return FPaths::Combine( GetScopedSettingsDirectory( EGlobalSettingSyncerScope::PerProject ), "GlobalSettingSyncerSettings.json" );
 }
 
 bool UGlobalSettingSyncerConfig::SaveConfigFile( const FConfigFileSettings& Filter, const FString& TargetDirectory )
@@ -626,6 +562,65 @@ TArray< FString > UGlobalSettingSyncerConfig::GetConfigFilesToSync() const
 	}
 
 	return ConfigFiles;
+}
+
+bool UGlobalSettingSyncerConfig::SavePluginSettings() const
+{
+	TRACE_CPU_SCOPE;
+
+	const FString SettingsFilePath = GetPluginSettingsFilePath();
+	const FString SettingsDir      = FPaths::GetPath( SettingsFilePath );
+	if( !EnsureDirectoryExists( SettingsDir ) )
+	{
+		UE_LOG( GlobalSettingSyncer, Error, TEXT( "Failed to create settings directory: %s" ), *SettingsDir );
+		return false;
+	}
+
+	FString OutputString;
+	if( !FJsonObjectConverter::UStructToJsonObjectString( ConfigFileSettingsStruct, OutputString, 0, 0, 0, nullptr, true ) )
+	{
+		UE_LOG( GlobalSettingSyncer, Error, TEXT( "Failed to convert settings JSON: %s" ), *SettingsFilePath );
+		return false;
+	}
+
+	if( !FFileHelper::SaveStringToFile( OutputString, *SettingsFilePath ) )
+	{
+		UE_LOG( GlobalSettingSyncer, Error, TEXT( "Failed to write settings file: %s" ), *SettingsFilePath );
+		return false;
+	}
+
+	UE_LOG( GlobalSettingSyncer, Log, TEXT( "Plugin settings saved to: %s" ), *SettingsFilePath );
+	return true;
+}
+
+bool UGlobalSettingSyncerConfig::LoadPluginSettings()
+{
+	TRACE_CPU_SCOPE;
+
+	const FString SettingsFilePath = GetPluginSettingsFilePath();
+
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	if( !PlatformFile.FileExists( *SettingsFilePath ) )
+	{
+		UE_LOG( GlobalSettingSyncer, Warning, TEXT( "Settings file not found: %s" ), *SettingsFilePath );
+		return false;
+	}
+
+	FString JsonString;
+	if( !FFileHelper::LoadFileToString( JsonString, *SettingsFilePath ) )
+	{
+		UE_LOG( GlobalSettingSyncer, Error, TEXT( "Failed to read settings file: %s" ), *SettingsFilePath );
+		return false;
+	}
+
+	if( !FJsonObjectConverter::JsonObjectStringToUStruct( JsonString, &ConfigFileSettingsStruct ) )
+	{
+		UE_LOG( GlobalSettingSyncer, Error, TEXT( "Failed to convert settings JSON: %s" ), *SettingsFilePath );
+		return false;
+	}
+
+	UE_LOG( GlobalSettingSyncer, Log, TEXT( "Plugin settings loaded from: %s" ), *SettingsFilePath );
+	return true;
 }
 
 void UGlobalSettingSyncerConfig::EnableAutoSync()

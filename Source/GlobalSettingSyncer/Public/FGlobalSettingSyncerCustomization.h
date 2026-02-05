@@ -10,7 +10,7 @@ class UGlobalSettingSyncerConfig;
 class FGlobalSettingSyncerCustomization : public IDetailCustomization
 {
 public:
-	static TSharedRef< IDetailCustomization > MakeInstance();
+	static TSharedRef< IDetailCustomization > MakeInstance() { return MakeShareable( new FGlobalSettingSyncerCustomization ); }
 
 	virtual void CustomizeDetails( IDetailLayoutBuilder& DetailBuilder ) override;
 

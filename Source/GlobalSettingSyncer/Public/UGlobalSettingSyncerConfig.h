@@ -57,19 +57,11 @@ class GLOBALSETTINGSYNCER_API UGlobalSettingSyncerConfig : public UObject
 public:
 	UGlobalSettingSyncerConfig();
 
+	static UGlobalSettingSyncerConfig* Get();
+
 	void DiscoverAndAddConfigFiles();
 	bool SaveSettingsToGlobal();
 	bool LoadSettingsFromGlobal();
-
-	static FString GetGlobalSettingSyncerDirectory();
-
-	static FString GetScopedSettingsDirectory( EGlobalSettingSyncerScope Scope );
-
-	static UGlobalSettingSyncerConfig* Get();
-
-	bool           SavePluginSettings() const;
-	bool           LoadPluginSettings();
-	static FString GetPluginSettingsFilePath();
 
 	void Initialize() { EnableAutoSync(); }
 
@@ -84,6 +76,10 @@ public:
 	static FString FindConfigFilePath( const FString& FileName );
 
 	static FString GetRelativePathForFile( const FString& AbsolutePath );
+
+	static FString GetGlobalSettingSyncerDirectory();
+	static FString GetScopedSettingsDirectory( EGlobalSettingSyncerScope Scope );
+	static FString GetPluginSettingsFilePath();
 
 	UPROPERTY( EditAnywhere )
 	FConfigFileSettingsStruct ConfigFileSettingsStruct;
@@ -102,6 +98,9 @@ private:
 	void InitializeDefaultFileFilters();
 
 	TArray< FString > GetConfigFilesToSync() const;
+
+	bool SavePluginSettings() const;
+	bool LoadPluginSettings();
 
 	void EnableAutoSync();
 
