@@ -34,6 +34,8 @@ void FGlobalSettingSyncerModule::ShutdownModule()
 {
 	TRACE_CPU_SCOPE;
 
+	UGlobalSettingSyncerConfig::Get()->Shutdown();
+
 	UToolMenus::UnRegisterStartupCallback( this );
 	UToolMenus::UnregisterOwner( this );
 
@@ -45,8 +47,6 @@ void FGlobalSettingSyncerModule::ShutdownModule()
 		FPropertyEditorModule& PropertyModule = FModuleManager::GetModuleChecked< FPropertyEditorModule >( "PropertyEditor" );
 		PropertyModule.UnregisterCustomClassLayout( UGlobalSettingSyncerConfig::StaticClass()->GetFName() );
 	}
-
-	UGlobalSettingSyncerConfig::Get()->Shutdown();
 }
 
 void FGlobalSettingSyncerModule::PluginButtonClicked()

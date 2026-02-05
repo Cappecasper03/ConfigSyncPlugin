@@ -18,16 +18,10 @@ struct FConfigFileSettings
 {
 	GENERATED_BODY()
 
-	FConfigFileSettings() = default;
-
-	FConfigFileSettings( const FString& InFileName, const bool bInEnabled = true )
-	: FileName( InFileName )
-	, bEnabled( bInEnabled ) {}
-
-	UPROPERTY( EditAnywhere )
+	UPROPERTY( VisibleAnywhere )
 	FString FileName;
 
-	UPROPERTY( EditAnywhere )
+	UPROPERTY( VisibleAnywhere )
 	FString RelativePath;
 
 	UPROPERTY( EditAnywhere )
@@ -55,64 +49,36 @@ class GLOBALSETTINGSYNCER_API UGlobalSettingSyncerConfig : public UObject
 	GENERATED_BODY()
 
 public:
-	UGlobalSettingSyncerConfig();
-
 	static UGlobalSettingSyncerConfig* Get();
 
-	void DiscoverAndAddConfigFiles();
-	bool SaveSettingsToGlobal();
-	bool LoadSettingsFromGlobal();
-
 	void Initialize() { EnableAutoSync(); }
+	void Shutdown() const { DisableAutoSync(); }
 
-	void Shutdown() { DisableAutoSync(); }
-
-	FDateTime GetLastSyncTime() const { return LastSyncTime; }
+	void DiscoverAndAddConfigFiles();
+	void SaveSettingsToGlobal();
+	void LoadSettingsFromGlobal();
 
 	void OnSettingsChanged();
-
-	static TArray< FString > DiscoverAllConfigFiles();
-
-	static FString FindConfigFilePath( const FString& FileName );
-
-	static FString GetRelativePathForFile( const FString& AbsolutePath );
-
-	static FString GetGlobalSettingSyncerDirectory();
-	static FString GetScopedSettingsDirectory( EGlobalSettingSyncerScope Scope );
-	static FString GetPluginSettingsFilePath();
 
 	UPROPERTY( EditAnywhere )
 	FConfigFileSettingsStruct ConfigFileSettingsStruct;
 
 private:
-	static bool SaveConfigFile( const FConfigFileSettings& Filter, const FString& TargetDirectory );
-	static bool LoadConfigFile( const FConfigFileSettings& Filter, const FString& SourceDirectory );
-
-	static bool SaveConfigFiles( const FString& TargetDirectory );
-	static bool LoadConfigFiles( const FString& SourceDirectory );
-
-	static bool CopyIniFile( const FString& SourcePath, const FString& DestPath );
-
-	static bool EnsureDirectoryExists( const FString& DirectoryPath );
-
-	void InitializeDefaultFileFilters();
-
-	TArray< FString > GetConfigFilesToSync() const;
-
-	bool SavePluginSettings() const;
-	bool LoadPluginSettings();
+	void SavePluginSettings() const;
+	void LoadPluginSettings();
 
 	void EnableAutoSync();
+	void DisableAutoSync() const;
 
-	void DisableAutoSync();
+	bool AutoSyncTick( float DeltaTime );
 
-	void OnDirectoryChanged( const TArray< struct FFileChangeData >& FileChanges );
+	static bool CopyIniFile( const FString& Source, const FString& Destination );
+	static bool EnsureDirectoryExists( const FString& DirectoryPath );
+
+	static FString GetScopedSettingsDirectory( EGlobalSettingSyncerScope Scope );
+	static FString GetPluginSettingsFilePath();
+
+	FTSTicker::FDelegateHandle AutoSyncHandle;
 
 	static UGlobalSettingSyncerConfig* Instance;
-
-	FDateTime                 LastSyncTime;
-	FTimerHandle              AutoSyncTimerHandle;
-	TArray< FDelegateHandle > DirectoryWatcherHandles;
-	TSet< FString >           PendingChangedFiles;
-	FTimerHandle              ProcessChangesTimerHandle;
 };
