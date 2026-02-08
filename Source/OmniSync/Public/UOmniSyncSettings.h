@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 
-#include "UOmniSyncConfig.generated.h"
+#include "UOmniSyncSettings.generated.h"
 
 UENUM( BlueprintType )
 enum class EOmniSyncScope : uint8
@@ -44,12 +44,12 @@ struct FConfigFileSettingsStruct
 };
 
 UCLASS()
-class OMNISYNC_API UOmniSyncConfig : public UObject
+class OMNISYNC_API UOmniSyncSettings : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	static UOmniSyncConfig* Get();
+	static UOmniSyncSettings* Get();
 
 	void Initialize() { EnableAutoSync(); }
 	void Shutdown() const { DisableAutoSync(); }
@@ -80,5 +80,5 @@ private:
 
 	FTSTicker::FDelegateHandle AutoSyncHandle;
 
-	static UOmniSyncConfig* Instance;
+	static UOmniSyncSettings* Instance;
 };

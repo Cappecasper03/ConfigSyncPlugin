@@ -4,21 +4,25 @@
 #include "IDetailCustomization.h"
 
 class IDetailLayoutBuilder;
-class UOmniSyncConfig;
+class UOmniSyncSettings;
+
+struct FPropertyHandles
+{
+	TSharedPtr< IPropertyHandle > EnabledHandle;
+	TSharedPtr< IPropertyHandle > ScopeHandle;
+	TSharedPtr< IPropertyHandle > AutoSyncHandle;
+};
 
 struct FConfigTreeItem
 {
 	FString Name;
 	FString FullPath;
-	bool    bIsFolder = false;
+	bool    bIsFolder   = false;
+	bool    bIsSettings = false;
 
-	TSharedPtr< IPropertyHandle > EnabledHandle;
-	TSharedPtr< IPropertyHandle > ScopeHandle;
-	TSharedPtr< IPropertyHandle > AutoSyncHandle;
+	TSharedPtr< FPropertyHandles > PropertyHandles = nullptr;
 
 	TArray< TSharedRef< FConfigTreeItem > > Children;
-
-	bool bIsExpanded = false;
 };
 
 class FOmniSyncCustomization : public IDetailCustomization
@@ -34,7 +38,7 @@ private:
 	TSharedRef< ITableRow > OnGenerateRow( TSharedRef< FConfigTreeItem > InItem, const TSharedRef< STableViewBase >& OwnerTable ) const;
 	void                    OnGetChildren( TSharedRef< FConfigTreeItem > InItem, TArray< TSharedRef< FConfigTreeItem > >& OutChildren ) { OutChildren = InItem->Children; }
 
-	TWeakObjectPtr< UOmniSyncConfig >                        ConfigObject;
+	TWeakObjectPtr< UOmniSyncSettings >                      ConfigObject;
 	TSharedPtr< STreeView< TSharedRef< FConfigTreeItem > > > TreeView;
 	TArray< TSharedRef< FConfigTreeItem > >                  RootItems;
 };

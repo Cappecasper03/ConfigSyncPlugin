@@ -3,7 +3,7 @@
 #include "FOmniSyncCustomization.h"
 #include "ISettingsModule.h"
 #include "Macros.h"
-#include "UOmniSyncConfig.h"
+#include "UOmniSyncSettings.h"
 
 #define LOCTEXT_NAMESPACE "FOmniSyncModule"
 
@@ -20,21 +20,21 @@ void FOmniSyncModule::StartupModule()
 		                                  "OmniSync",
 		                                  LOCTEXT( "RuntimeSettingsName", "OmniSync" ),
 		                                  LOCTEXT( "RuntimeSettingsDescription", "Configure OmniSync Settings" ),
-		                                  UOmniSyncConfig::Get() );
+		                                  UOmniSyncSettings::Get() );
 	}
 
 	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked< FPropertyEditorModule >( "PropertyEditor" );
-	PropertyModule.RegisterCustomClassLayout( UOmniSyncConfig::StaticClass()->GetFName(),
+	PropertyModule.RegisterCustomClassLayout( UOmniSyncSettings::StaticClass()->GetFName(),
 	                                          FOnGetDetailCustomizationInstance::CreateStatic( &FOmniSyncCustomization::MakeInstance ) );
 
-	UOmniSyncConfig::Get()->Initialize();
+	UOmniSyncSettings::Get()->Initialize();
 }
 
 void FOmniSyncModule::ShutdownModule()
 {
 	TRACE_CPU_SCOPE;
 
-	UOmniSyncConfig::Get()->Shutdown();
+	UOmniSyncSettings::Get()->Shutdown();
 
 	UToolMenus::UnRegisterStartupCallback( this );
 	UToolMenus::UnregisterOwner( this );
@@ -45,7 +45,7 @@ void FOmniSyncModule::ShutdownModule()
 	if( FModuleManager::Get().IsModuleLoaded( "PropertyEditor" ) )
 	{
 		FPropertyEditorModule& PropertyModule = FModuleManager::GetModuleChecked< FPropertyEditorModule >( "PropertyEditor" );
-		PropertyModule.UnregisterCustomClassLayout( UOmniSyncConfig::StaticClass()->GetFName() );
+		PropertyModule.UnregisterCustomClassLayout( UOmniSyncSettings::StaticClass()->GetFName() );
 	}
 }
 

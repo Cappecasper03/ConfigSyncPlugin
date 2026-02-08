@@ -1,16 +1,16 @@
-#include "UOmniSyncConfig.h"
+#include "UOmniSyncSettings.h"
 
 #include "FOmniSync.h"
 #include "JsonObjectConverter.h"
 #include "Macros.h"
 
-UOmniSyncConfig* UOmniSyncConfig::Get()
+UOmniSyncSettings* UOmniSyncSettings::Get()
 {
 	TRACE_CPU_SCOPE;
 
 	if( !Instance )
 	{
-		Instance = GetMutableDefault< UOmniSyncConfig >();
+		Instance = GetMutableDefault< UOmniSyncSettings >();
 		Instance->AddToRoot();
 		Instance->LoadPluginSettings();
 		Instance->DiscoverAndAddConfigFiles();
@@ -19,7 +19,7 @@ UOmniSyncConfig* UOmniSyncConfig::Get()
 	return Instance;
 }
 
-void UOmniSyncConfig::DiscoverAndAddConfigFiles()
+void UOmniSyncSettings::DiscoverAndAddConfigFiles()
 {
 	TRACE_CPU_SCOPE;
 
@@ -73,7 +73,7 @@ void UOmniSyncConfig::DiscoverAndAddConfigFiles()
 		SavePluginSettings();
 }
 
-void UOmniSyncConfig::SaveSettingsToGlobal()
+void UOmniSyncSettings::SaveSettingsToGlobal()
 {
 	TRACE_CPU_SCOPE;
 
@@ -89,7 +89,7 @@ void UOmniSyncConfig::SaveSettingsToGlobal()
 	}
 }
 
-void UOmniSyncConfig::LoadSettingsFromGlobal()
+void UOmniSyncSettings::LoadSettingsFromGlobal()
 {
 	TRACE_CPU_SCOPE;
 
@@ -105,7 +105,7 @@ void UOmniSyncConfig::LoadSettingsFromGlobal()
 	}
 }
 
-void UOmniSyncConfig::OnSettingsChanged()
+void UOmniSyncSettings::OnSettingsChanged()
 {
 	TRACE_CPU_SCOPE;
 
@@ -113,7 +113,7 @@ void UOmniSyncConfig::OnSettingsChanged()
 	SaveSettingsToGlobal();
 }
 
-void UOmniSyncConfig::SavePluginSettings() const
+void UOmniSyncSettings::SavePluginSettings() const
 {
 	TRACE_CPU_SCOPE;
 
@@ -141,7 +141,7 @@ void UOmniSyncConfig::SavePluginSettings() const
 	UE_LOG( OmniSync, Log, TEXT( "Plugin settings saved to: %s" ), *SettingsFilePath );
 }
 
-void UOmniSyncConfig::LoadPluginSettings()
+void UOmniSyncSettings::LoadPluginSettings()
 {
 	TRACE_CPU_SCOPE;
 
@@ -167,24 +167,24 @@ void UOmniSyncConfig::LoadPluginSettings()
 	UE_LOG( OmniSync, Log, TEXT( "Plugin settings loaded from: %s" ), *SettingsFilePath );
 }
 
-void UOmniSyncConfig::EnableAutoSync()
+void UOmniSyncSettings::EnableAutoSync()
 {
 	TRACE_CPU_SCOPE;
 
 	if( AutoSyncHandle.IsValid() )
 		return;
 
-	AutoSyncHandle = FTSTicker::GetCoreTicker().AddTicker( FTickerDelegate::CreateUObject( this, &UOmniSyncConfig::AutoSyncTick ), 10 );
+	AutoSyncHandle = FTSTicker::GetCoreTicker().AddTicker( FTickerDelegate::CreateUObject( this, &UOmniSyncSettings::AutoSyncTick ), 10 );
 }
 
-void UOmniSyncConfig::DisableAutoSync() const
+void UOmniSyncSettings::DisableAutoSync() const
 {
 	TRACE_CPU_SCOPE;
 
 	FTSTicker::GetCoreTicker().RemoveTicker( AutoSyncHandle );
 }
 
-bool UOmniSyncConfig::AutoSyncTick( const float DeltaTime )
+bool UOmniSyncSettings::AutoSyncTick( const float DeltaTime )
 {
 	TRACE_CPU_SCOPE;
 
@@ -208,7 +208,7 @@ bool UOmniSyncConfig::AutoSyncTick( const float DeltaTime )
 	return true;
 }
 
-bool UOmniSyncConfig::CopyIniFile( const FString& Source, const FString& Destination )
+bool UOmniSyncSettings::CopyIniFile( const FString& Source, const FString& Destination )
 {
 	TRACE_CPU_SCOPE;
 
@@ -223,7 +223,7 @@ bool UOmniSyncConfig::CopyIniFile( const FString& Source, const FString& Destina
 	return PlatformFile.CopyFile( *Destination, *Source );
 }
 
-bool UOmniSyncConfig::EnsureDirectoryExists( const FString& DirectoryPath )
+bool UOmniSyncSettings::EnsureDirectoryExists( const FString& DirectoryPath )
 {
 	TRACE_CPU_SCOPE;
 
@@ -235,7 +235,7 @@ bool UOmniSyncConfig::EnsureDirectoryExists( const FString& DirectoryPath )
 	return PlatformFile.CreateDirectoryTree( *DirectoryPath );
 }
 
-FString UOmniSyncConfig::GetScopedSettingsDirectory( const EOmniSyncScope Scope )
+FString UOmniSyncSettings::GetScopedSettingsDirectory( const EOmniSyncScope Scope )
 {
 	TRACE_CPU_SCOPE;
 
@@ -257,10 +257,10 @@ FString UOmniSyncConfig::GetScopedSettingsDirectory( const EOmniSyncScope Scope 
 	}
 }
 
-FString UOmniSyncConfig::GetPluginSettingsFilePath()
+FString UOmniSyncSettings::GetPluginSettingsFilePath()
 {
 	TRACE_CPU_SCOPE;
 	return FPaths::Combine( GetScopedSettingsDirectory( EOmniSyncScope::PerProject ), "OmniSyncSettings.json" );
 }
 
-UOmniSyncConfig* UOmniSyncConfig::Instance = nullptr;
+UOmniSyncSettings* UOmniSyncSettings::Instance = nullptr;
