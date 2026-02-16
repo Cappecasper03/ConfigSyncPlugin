@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-DECLARE_LOG_CATEGORY_EXTERN( ConfigSync, Log, All )
+DECLARE_LOG_CATEGORY_EXTERN( LogConfigSync, Log, All )
 
 class FConfigSyncModule : public IModuleInterface
 {

@@ -121,24 +121,24 @@ void UConfigSyncSettings::SavePluginSettings() const
 	const FString SettingsDir      = FPaths::GetPath( SettingsFilePath );
 	if( !EnsureDirectoryExists( SettingsDir ) )
 	{
-		UE_LOG( ConfigSync, Error, TEXT( "Failed to create settings directory: %s" ), *SettingsDir );
+		UE_LOG( LogConfigSync, Error, TEXT( "Failed to create settings directory: %s" ), *SettingsDir );
 		return;
 	}
 
 	FString OutputString;
 	if( !FJsonObjectConverter::UStructToJsonObjectString( ConfigFileSettingsStruct, OutputString, 0, 0, 0, nullptr, true ) )
 	{
-		UE_LOG( ConfigSync, Error, TEXT( "Failed to convert settings JSON: %s" ), *SettingsFilePath );
+		UE_LOG( LogConfigSync, Error, TEXT( "Failed to convert settings JSON: %s" ), *SettingsFilePath );
 		return;
 	}
 
 	if( !FFileHelper::SaveStringToFile( OutputString, *SettingsFilePath ) )
 	{
-		UE_LOG( ConfigSync, Error, TEXT( "Failed to write settings file: %s" ), *SettingsFilePath );
+		UE_LOG( LogConfigSync, Error, TEXT( "Failed to write settings file: %s" ), *SettingsFilePath );
 		return;
 	}
 
-	UE_LOG( ConfigSync, Log, TEXT( "Plugin settings saved to: %s" ), *SettingsFilePath );
+	UE_LOG( LogConfigSync, Log, TEXT( "Plugin settings saved to: %s" ), *SettingsFilePath );
 }
 
 void UConfigSyncSettings::LoadPluginSettings()
@@ -154,17 +154,17 @@ void UConfigSyncSettings::LoadPluginSettings()
 	FString JsonString;
 	if( !FFileHelper::LoadFileToString( JsonString, *SettingsFilePath ) )
 	{
-		UE_LOG( ConfigSync, Error, TEXT( "Failed to read settings file: %s" ), *SettingsFilePath );
+		UE_LOG( LogConfigSync, Error, TEXT( "Failed to read settings file: %s" ), *SettingsFilePath );
 		return;
 	}
 
 	if( !FJsonObjectConverter::JsonObjectStringToUStruct( JsonString, &ConfigFileSettingsStruct ) )
 	{
-		UE_LOG( ConfigSync, Error, TEXT( "Failed to convert settings JSON: %s" ), *SettingsFilePath );
+		UE_LOG( LogConfigSync, Error, TEXT( "Failed to convert settings JSON: %s" ), *SettingsFilePath );
 		return;
 	}
 
-	UE_LOG( ConfigSync, Log, TEXT( "Plugin settings loaded from: %s" ), *SettingsFilePath );
+	UE_LOG( LogConfigSync, Log, TEXT( "Plugin settings loaded from: %s" ), *SettingsFilePath );
 }
 
 void UConfigSyncSettings::EnableAutoSync()

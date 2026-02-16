@@ -44,7 +44,7 @@ struct FConfigFileSettingsStruct
 };
 
 UCLASS()
-class OMNISYNC_API UConfigSyncSettings : public UObject
+class CONFIGSYNC_API UConfigSyncSettings : public UObject
 {
 	GENERATED_BODY()
 

@@ -5,9 +5,7 @@
 #include "Macros.h"
 #include "UConfigSyncSettings.h"
 
-#define LOCTEXT_NAMESPACE "FConfigSyncModule"
-
-DEFINE_LOG_CATEGORY( ConfigSync );
+DEFINE_LOG_CATEGORY( LogConfigSync );
 
 void FConfigSyncModule::StartupModule()
 {
@@ -18,8 +16,8 @@ void FConfigSyncModule::StartupModule()
 		SettingsModule->RegisterSettings( "Editor",
 		                                  "Plugins",
 		                                  "ConfigSync",
-		                                  LOCTEXT( "RuntimeSettingsName", "ConfigSync" ),
-		                                  LOCTEXT( "RuntimeSettingsDescription", "Configure ConfigSync Settings" ),
+		                                  FText::FromString( "ConfigSync" ),
+		                                  FText::FromString( "Configure ConfigSync Settings" ),
 		                                  UConfigSyncSettings::Get() );
 	}
 
@@ -55,7 +53,5 @@ void FConfigSyncModule::PluginButtonClicked()
 
 	FModuleManager::LoadModuleChecked< ISettingsModule >( "Settings" ).ShowViewer( "Editor", "Plugins", "ConfigSync" );
 }
-
-#undef LOCTEXT_NAMESPACE
 
 IMPLEMENT_MODULE( FConfigSyncModule, ConfigSync )
