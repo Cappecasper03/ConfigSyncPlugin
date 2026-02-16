@@ -1,8 +1,8 @@
 using UnrealBuildTool;
 
-public class OmniSync : ModuleRules
+public class ConfigSync : ModuleRules
 {
-	public OmniSync(ReadOnlyTargetRules Target) : base(Target)
+	public ConfigSync(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 

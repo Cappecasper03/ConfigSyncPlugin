@@ -3,10 +3,10 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 
-#include "UOmniSyncSettings.generated.h"
+#include "UConfigSyncSettings.generated.h"
 
 UENUM( BlueprintType )
-enum class EOmniSyncScope : uint8
+enum class EConfigSyncScope : uint8
 {
 	Global,
 	PerEngineVersion,
@@ -28,7 +28,7 @@ struct FConfigFileSettings
 	bool bEnabled = false;
 
 	UPROPERTY( EditAnywhere )
-	EOmniSyncScope SettingsScope = EOmniSyncScope::PerEngineVersion;
+	EConfigSyncScope SettingsScope = EConfigSyncScope::PerEngineVersion;
 
 	UPROPERTY( EditAnywhere )
 	bool bAutoSyncEnabled = true;
@@ -44,12 +44,12 @@ struct FConfigFileSettingsStruct
 };
 
 UCLASS()
-class OMNISYNC_API UOmniSyncSettings : public UObject
+class OMNISYNC_API UConfigSyncSettings : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	static UOmniSyncSettings* Get();
+	static UConfigSyncSettings* Get();
 
 	void Initialize() { EnableAutoSync(); }
 	void Shutdown() const { DisableAutoSync(); }
@@ -75,10 +75,10 @@ private:
 	static bool CopyIniFile( const FString& Source, const FString& Destination );
 	static bool EnsureDirectoryExists( const FString& DirectoryPath );
 
-	static FString GetScopedSettingsDirectory( EOmniSyncScope Scope );
+	static FString GetScopedSettingsDirectory( EConfigSyncScope Scope );
 	static FString GetPluginSettingsFilePath();
 
 	FTSTicker::FDelegateHandle AutoSyncHandle;
 
-	static UOmniSyncSettings* Instance;
+	static UConfigSyncSettings* Instance;
 };

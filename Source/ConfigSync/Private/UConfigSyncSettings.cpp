@@ -1,16 +1,16 @@
-#include "UOmniSyncSettings.h"
+#include "UConfigSyncSettings.h"
 
-#include "FOmniSync.h"
+#include "FConfigSync.h"
 #include "JsonObjectConverter.h"
 #include "Macros.h"
 
-UOmniSyncSettings* UOmniSyncSettings::Get()
+UConfigSyncSettings* UConfigSyncSettings::Get()
 {
 	TRACE_CPU_SCOPE;
 
 	if( !Instance )
 	{
-		Instance = GetMutableDefault< UOmniSyncSettings >();
+		Instance = GetMutableDefault< UConfigSyncSettings >();
 		Instance->AddToRoot();
 		Instance->LoadPluginSettings();
 		Instance->DiscoverAndAddConfigFiles();
@@ -19,7 +19,7 @@ UOmniSyncSettings* UOmniSyncSettings::Get()
 	return Instance;
 }
 
-void UOmniSyncSettings::DiscoverAndAddConfigFiles()
+void UConfigSyncSettings::DiscoverAndAddConfigFiles()
 {
 	TRACE_CPU_SCOPE;
 
@@ -73,7 +73,7 @@ void UOmniSyncSettings::DiscoverAndAddConfigFiles()
 		SavePluginSettings();
 }
 
-void UOmniSyncSettings::SaveSettingsToGlobal()
+void UConfigSyncSettings::SaveSettingsToGlobal()
 {
 	TRACE_CPU_SCOPE;
 
@@ -89,7 +89,7 @@ void UOmniSyncSettings::SaveSettingsToGlobal()
 	}
 }
 
-void UOmniSyncSettings::LoadSettingsFromGlobal()
+void UConfigSyncSettings::LoadSettingsFromGlobal()
 {
 	TRACE_CPU_SCOPE;
 
@@ -105,7 +105,7 @@ void UOmniSyncSettings::LoadSettingsFromGlobal()
 	}
 }
 
-void UOmniSyncSettings::OnSettingsChanged()
+void UConfigSyncSettings::OnSettingsChanged()
 {
 	TRACE_CPU_SCOPE;
 
@@ -113,7 +113,7 @@ void UOmniSyncSettings::OnSettingsChanged()
 	SaveSettingsToGlobal();
 }
 
-void UOmniSyncSettings::SavePluginSettings() const
+void UConfigSyncSettings::SavePluginSettings() const
 {
 	TRACE_CPU_SCOPE;
 
@@ -121,27 +121,27 @@ void UOmniSyncSettings::SavePluginSettings() const
 	const FString SettingsDir      = FPaths::GetPath( SettingsFilePath );
 	if( !EnsureDirectoryExists( SettingsDir ) )
 	{
-		UE_LOG( OmniSync, Error, TEXT( "Failed to create settings directory: %s" ), *SettingsDir );
+		UE_LOG( ConfigSync, Error, TEXT( "Failed to create settings directory: %s" ), *SettingsDir );
 		return;
 	}
 
 	FString OutputString;
 	if( !FJsonObjectConverter::UStructToJsonObjectString( ConfigFileSettingsStruct, OutputString, 0, 0, 0, nullptr, true ) )
 	{
-		UE_LOG( OmniSync, Error, TEXT( "Failed to convert settings JSON: %s" ), *SettingsFilePath );
+		UE_LOG( ConfigSync, Error, TEXT( "Failed to convert settings JSON: %s" ), *SettingsFilePath );
 		return;
 	}
 
 	if( !FFileHelper::SaveStringToFile( OutputString, *SettingsFilePath ) )
 	{
-		UE_LOG( OmniSync, Error, TEXT( "Failed to write settings file: %s" ), *SettingsFilePath );
+		UE_LOG( ConfigSync, Error, TEXT( "Failed to write settings file: %s" ), *SettingsFilePath );
 		return;
 	}
 
-	UE_LOG( OmniSync, Log, TEXT( "Plugin settings saved to: %s" ), *SettingsFilePath );
+	UE_LOG( ConfigSync, Log, TEXT( "Plugin settings saved to: %s" ), *SettingsFilePath );
 }
 
-void UOmniSyncSettings::LoadPluginSettings()
+void UConfigSyncSettings::LoadPluginSettings()
 {
 	TRACE_CPU_SCOPE;
 
@@ -154,37 +154,37 @@ void UOmniSyncSettings::LoadPluginSettings()
 	FString JsonString;
 	if( !FFileHelper::LoadFileToString( JsonString, *SettingsFilePath ) )
 	{
-		UE_LOG( OmniSync, Error, TEXT( "Failed to read settings file: %s" ), *SettingsFilePath );
+		UE_LOG( ConfigSync, Error, TEXT( "Failed to read settings file: %s" ), *SettingsFilePath );
 		return;
 	}
 
 	if( !FJsonObjectConverter::JsonObjectStringToUStruct( JsonString, &ConfigFileSettingsStruct ) )
 	{
-		UE_LOG( OmniSync, Error, TEXT( "Failed to convert settings JSON: %s" ), *SettingsFilePath );
+		UE_LOG( ConfigSync, Error, TEXT( "Failed to convert settings JSON: %s" ), *SettingsFilePath );
 		return;
 	}
 
-	UE_LOG( OmniSync, Log, TEXT( "Plugin settings loaded from: %s" ), *SettingsFilePath );
+	UE_LOG( ConfigSync, Log, TEXT( "Plugin settings loaded from: %s" ), *SettingsFilePath );
 }
 
-void UOmniSyncSettings::EnableAutoSync()
+void UConfigSyncSettings::EnableAutoSync()
 {
 	TRACE_CPU_SCOPE;
 
 	if( AutoSyncHandle.IsValid() )
 		return;
 
-	AutoSyncHandle = FTSTicker::GetCoreTicker().AddTicker( FTickerDelegate::CreateUObject( this, &UOmniSyncSettings::AutoSyncTick ), 10 );
+	AutoSyncHandle = FTSTicker::GetCoreTicker().AddTicker( FTickerDelegate::CreateUObject( this, &UConfigSyncSettings::AutoSyncTick ), 10 );
 }
 
-void UOmniSyncSettings::DisableAutoSync() const
+void UConfigSyncSettings::DisableAutoSync() const
 {
 	TRACE_CPU_SCOPE;
 
 	FTSTicker::GetCoreTicker().RemoveTicker( AutoSyncHandle );
 }
 
-bool UOmniSyncSettings::AutoSyncTick( const float DeltaTime )
+bool UConfigSyncSettings::AutoSyncTick( const float DeltaTime )
 {
 	TRACE_CPU_SCOPE;
 
@@ -208,7 +208,7 @@ bool UOmniSyncSettings::AutoSyncTick( const float DeltaTime )
 	return true;
 }
 
-bool UOmniSyncSettings::CopyIniFile( const FString& Source, const FString& Destination )
+bool UConfigSyncSettings::CopyIniFile( const FString& Source, const FString& Destination )
 {
 	TRACE_CPU_SCOPE;
 
@@ -223,7 +223,7 @@ bool UOmniSyncSettings::CopyIniFile( const FString& Source, const FString& Desti
 	return PlatformFile.CopyFile( *Destination, *Source );
 }
 
-bool UOmniSyncSettings::EnsureDirectoryExists( const FString& DirectoryPath )
+bool UConfigSyncSettings::EnsureDirectoryExists( const FString& DirectoryPath )
 {
 	TRACE_CPU_SCOPE;
 
@@ -235,32 +235,32 @@ bool UOmniSyncSettings::EnsureDirectoryExists( const FString& DirectoryPath )
 	return PlatformFile.CreateDirectoryTree( *DirectoryPath );
 }
 
-FString UOmniSyncSettings::GetScopedSettingsDirectory( const EOmniSyncScope Scope )
+FString UConfigSyncSettings::GetScopedSettingsDirectory( const EConfigSyncScope Scope )
 {
 	TRACE_CPU_SCOPE;
 
 	static FString UserSettingsDir = FPlatformProcess::UserSettingsDir();
-	FString        BaseDir         = FPaths::Combine( UserSettingsDir, "UnrealEngine", "OmniSync" );
+	FString        BaseDir         = FPaths::Combine( UserSettingsDir, "UnrealEngine", "ConfigSync" );
 	switch( Scope )
 	{
-		case EOmniSyncScope::Global:
+		case EConfigSyncScope::Global:
 			return FPaths::Combine( BaseDir, "Global" );
-		case EOmniSyncScope::PerEngineVersion:
+		case EConfigSyncScope::PerEngineVersion:
 		{
 			static FString EngineVersion = FString::Printf( TEXT( "%d.%d" ), ENGINE_MAJOR_VERSION, ENGINE_MINOR_VERSION );
 			return FPaths::Combine( BaseDir, "PerEngineVersion", EngineVersion );
 		}
-		case EOmniSyncScope::PerProject:
+		case EConfigSyncScope::PerProject:
 			return FPaths::Combine( BaseDir, "PerProject", FApp::GetProjectName() );
 		default:
 			return BaseDir;
 	}
 }
 
-FString UOmniSyncSettings::GetPluginSettingsFilePath()
+FString UConfigSyncSettings::GetPluginSettingsFilePath()
 {
 	TRACE_CPU_SCOPE;
-	return FPaths::Combine( GetScopedSettingsDirectory( EOmniSyncScope::PerProject ), "OmniSyncSettings.json" );
+	return FPaths::Combine( GetScopedSettingsDirectory( EConfigSyncScope::PerProject ), "ConfigSyncSettings.json" );
 }
 
-UOmniSyncSettings* UOmniSyncSettings::Instance = nullptr;
+UConfigSyncSettings* UConfigSyncSettings::Instance = nullptr;

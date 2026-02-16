@@ -3,9 +3,9 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-DECLARE_LOG_CATEGORY_EXTERN( OmniSync, Log, All )
+DECLARE_LOG_CATEGORY_EXTERN( ConfigSync, Log, All )
 
-class FOmniSyncModule : public IModuleInterface
+class FConfigSyncModule : public IModuleInterface
 {
 public:
 	virtual void StartupModule() override;

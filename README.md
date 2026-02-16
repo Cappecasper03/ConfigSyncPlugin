@@ -1,4 +1,4 @@
-# OmniSync
+# ConfigSync
 
 Synchronize `.ini` configuration files across multiple Unreal Engine projects and engine versions.
 
@@ -8,7 +8,7 @@ Synchronize `.ini` configuration files across multiple Unreal Engine projects an
 
 1. Copy the plugin to your project's `Plugins/` directory
 2. Enable the plugin in **Edit → Plugins**  
-3. Open **Editor → Project Settings → Plugins → OmniSync**
+3. Open **Editor → Project Settings → Plugins → ConfigSync**
 4. Click **Discover All Config Files**
 5. Enable the files you want to sync and select their scope:
    - **Global** - Shared across all projects and engine versions
@@ -51,7 +51,7 @@ Centralized files are stored in:
 ---
 
 ```
-%USERPROFILE%/AppData/Local/UnrealEngine/OmniSync/
+%USERPROFILE%/AppData/Local/UnrealEngine/ConfigSync/
 ```
 
 ---
@@ -60,7 +60,7 @@ Centralized files are stored in:
 
 Contributions are welcome! Here's how you can help:
 
-- **Report Issues**: Found a bug or have a feature request? [Open an issue](https://github.com/yourusername/OmniSync/issues) on GitHub
+- **Report Issues**: Found a bug or have a feature request? [Open an issue](https://github.com/yourusername/ConfigSync/issues) on GitHub
 - **Submit Pull Requests**: Want to fix a bug or add a feature? Fork the repository and submit a pull request
 - **Test Compatibility**: Help test the plugin with different Unreal Engine versions and report your results
 
